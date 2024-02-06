@@ -2,8 +2,9 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import izitoast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
-import errorIcon from '../img/izitoast-icon.svg';
-import closeIcon from '../img/izitoast-close.svg';
+
+// import errorIcon from '../img/izitoast-icon.svg';
+// import closeIcon from '../img/izitoast-close.svg';
 
 const userLinks = {
     startButton: document.querySelector('[data-start]'),
