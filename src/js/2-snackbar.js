@@ -1,93 +1,48 @@
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
-
 import errorIcon from '../img/izitoast-icon.svg';
 import closeIcon from '../img/izitoast-close.svg';
 import okIcon from '../img/izitoast-ok.svg';
 
 const form = document.querySelector('.form');
-
-form.addEventListener('submit', function (e) {
-  e.preventDefault();
-
-  const delayInput = document.querySelector('input[name="delay"]').value;
-  const stateInputs = document.querySelectorAll('input[name="state"]');
-  const selectedState = [...stateInputs].find(input => input.checked);
-
-  if (!delayInput || !selectedState) {
-    showCustomToast(
-      'warning',
-      'Please fill the fields',
-      'warning-message',
-      '#FFA000',
-      warningIcon
-    );
-    return;
-  }
-
-  const delay = parseInt(delayInput);
-  const promise = new Promise((resolve, reject) => {
-    let timeoutId = setTimeout(() => {
-      if (selectedState.value === 'fulfilled') {
-        resolve(delay);
-      } else {
-        reject(delay);
-      }
-    }, delay);
-  });
-
-  promise
-    .then(delay => {
-      showCustomToast(
-        'OK',
-        `Fulfilled promise in ${delay}ms`,
-        'success-message',
-        '#59A10D',
-        okIcon
-      );
-      form.reset();
-    })
-    .catch(delay => {
-      showCustomToast(
-        'Error',
-        `Rejected promise in ${delay}ms`,
-        'warning-message',
-        '#ef4040',
-        errorIcon
-      );
-      form.reset();
-    });
+const input = form.querySelector('label > input');
+let delay;
+input.addEventListener('input', e => {
+  delay = e.currentTarget.value;
 });
 
-function showCustomToast(title, message, className, backgroundColor, iconUrl) {
-  iziToast.show({
-    messageSize: 'auto',
-    title: title,
-    message: message,
-    class: className,
-    position: 'topCenter',
-    titleColor: '#ffffff',
-    titleSize: '16px',
-    titleLineHeight: '1.5',
-    messageColor: '#ffffff',
-    messageSize: '16px',
-    messageLineHeight: '1.5',
-    backgroundColor: backgroundColor,
-    iconColor: '#ffffff',
-    iconUrl: iconUrl,
-    imageWidth: 50,
-    timeout: 10000,
-    close: false,
-    buttons: [
-      [
-        `<button type="button" style="background-color: ${backgroundColor}"><img src=${closeIcon}></button>`,
-        function (instance, toast) {
-          instance.hide({ transitionOut: 'fadeOut' }, toast);
-        },
-      ],
-    ],
-    closeOnEscape: true,
-    pauseOnHover: false,
-  });
-}
+form.addEventListener('submit', e => {
+  e.preventDefault();
+
+  function promise(delay, state) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (state === 'fulfilled') {
+          resolve(delay);
+        } else {
+          reject(delay);
+        }
+      }, delay);
+    });
+  }
+
+  promise(delay, form.elements.state.value)
+    .then(value => {
+      iziToast.show({
+        message: `✅ Fulfilled promise in ${value} ms`,
+        messageColor: '#FFFFFF',
+        backgroundColor: '#59A10D',
+        position: 'topRight',
+      });
+    })
+    .catch(value => {
+      iziToast.show({
+        message: `❌ Rejected promise in ${value} ms`,
+        messageColor: '#FFFFFF',
+        backgroundColor: '#EF4040',
+        position: 'topRight',
+      });
+    });
+  form.reset();
+});
